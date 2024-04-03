@@ -1,9 +1,29 @@
 import readlinesync = require("readline-sync");
 
 import { colors } from "./src/útil/colors";
+import { Produtocontroller } from "./src/03_Controller/Produtocontroller";
+import { manta_asfaltica } from "./src/model/manta_asfaltica";
+import { manta_liquida } from "./src/model/manta_liquida";
+import { Produto } from "./src/model/Principal";
+
 
 export function main() {
-    let opcao: number
+
+
+    let opcao, id, tipo, preco: number;
+    let nome, mantaasfáltica, mantalíquida: string;
+    let tipoProduto = ['Manta Líquida', 'Manta Asfáltica'];
+
+    const produtoController : Produtocontroller = new Produtocontroller();
+
+
+    produtoController.cadastrar(new manta_asfaltica(produtoController.gerarId(),
+        "Manta Asfaltica 15 ", 1, 60.00, "Manta Asfaltica 45"));
+
+    produtoController.cadastrar(new manta_liquida (produtoController.gerarId(),
+    "Manta Líquida 5L ", 2, 100.00, "Manta Líquida 10L"));
+
+
 
     while (true) {
 
@@ -37,30 +57,89 @@ export function main() {
         }
 
         switch (opcao) {
-            case 1:
-                console.log(colors.fg.whitestrong,
-                    "\n\nCriar Produto\n\n", colors.reset);
 
-                keyPress()
-                break;
+            case 1:
+                console.log(colors.fg.blackstrong,
+                    "\n\nListar todos os Produtos\n\n", colors.reset);
+
+                    nome = readlinesync.question("Digite o Nome do Produto: ");
+
+                    tipo = readlinesync.keyInSelect(tipoProduto, "", { cancel: false }) + 1;
+    
+                    preco = readlinesync.questionFloat("Digite o preco: ");
+
+
+                switch (tipo) {
+                    case 1:
+                        mantaasfáltica = readlinesync.question("Digite o tipo de Manta: ");
+                        produtoController.cadastrar(new manta_asfaltica(produtoController.gerarId(),
+                            nome, tipo, preco, mantaasfáltica));
+                        break;
+
+                        case 2:
+                            mantalíquida = readlinesync.question("Digite o tipo de Manta: ");
+                            produtoController.cadastrar(new manta_liquida(produtoController.gerarId(),
+                                nome, tipo, preco, mantalíquida));
+                            break;
+
+
 
             case 2:
-                console.log(colors.fg.whitestrong,
-                    "\n\nListar todos os Produtos\n\n", colors.reset);
+                console.log(colors.fg.greenstrong,
+                    "\n\nListar Produtos - por Id\n\n", colors.reset);
+
+                    id = readlinesync.questionInt("Digite o Id do Produto: ");
+                    produtoController.listarTodas();
 
                 keyPress()
                 break;
 
             case 3:
                 console.log(colors.fg.whitestrong,
-                    "\n\nConsultar dados do Produto - por Id\n\n", colors.reset);
+                    "\n\nCadastrar Produto\n\n", colors.reset);
+                    
+                    produtoController.listarTodas();
 
+    
                 keyPress()
-                break;
+                break;   
 
             case 4:
                 console.log(colors.fg.whitestrong,
                     "\n\nAtualizar dados do Produto\n\n", colors.reset);
+
+                    id = readlinesync.questionInt("Digite o Id do Produto: ");
+                    
+                    let produto = produtoController.buscarNoArray(id);
+
+                    if (produto !== null){
+
+                        nome = readlinesync.question("Digite o Nome do Produto: ");
+
+                        tipo = readlinesync.keyInSelect(tipoProduto,"", {cancel:false}) + 1;
+        
+                        preco = readlinesync.questionFloat("Digite o preco: ");
+
+                        switch (tipo) {
+
+                            case 1:
+                                mantaasfáltica = readlinesync.question("Digite o tipo de Manta: ");
+                                produtoController.atualizar(new manta_asfaltica(produtoController.gerarId(),
+                                    nome, tipo, preco, mantaasfáltica));
+
+                            break;
+        
+                                case 2:
+                                    mantalíquida = readlinesync.question("Digite o tipo de Manta: ");
+                                    produtoController.atualizar(new manta_liquida(produtoController.gerarId(),
+                                        nome, tipo, preco, mantalíquida));
+                                    break;
+                        }
+                        
+                    }else
+
+                    console.log("Produto não Encontrado!")
+        
 
 
                 keyPress()
@@ -68,7 +147,10 @@ export function main() {
 
             case 5:
                 console.log(colors.fg.whitestrong,
-                    "\n\nApagar um Produto\n\n", colors.reset);
+                    "\n\nDeletar um Produto\n\n", colors.reset);
+
+                    id = readlinesync.questionInt("Digite o Id do Produto: ");
+                    produtoController.deletar(id);
 
                 keyPress()
                 break;
@@ -97,6 +179,9 @@ function keyPress(): void {
     console.log(colors.reset, "");
     console.log("\nPressione enter para continuar...");
     readlinesync.prompt();
+}
+
+
 }
 
 main();
